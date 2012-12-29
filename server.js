@@ -1,4 +1,4 @@
-var express = require('express')
+var express = require('express');
 var http = require('http');
 var https = require('https');
 
@@ -10,7 +10,7 @@ request = function (url, callback) {
             body += chunk;
         });
         res.on('end', function() {
-          callback(null, res.headers['content-type'], body);
+          callback(null, body);
         });
     });
     req.on('error', function (e) {
@@ -20,22 +20,18 @@ request = function (url, callback) {
 }
 
 var app = express();
-app.get('/http/:url', function (req, res, next) {
-  request(req.params.url, function (err, contentType, body) {
-      res.setHeader('Access-Control-Allow-Origin','*');
-      res.setHeader('content-type',contentType);
-      if (err) res.send(err, 500);
-      else res.send(body);
-  });
-});
-app.get('/json/:url', function (req, res, next) {
-  request(req.params.url, function (err, contentType, body) {
-      res.setHeader('Access-Control-Allow-Origin','*');
-      res.setHeader('content-type',contentType);
-      if (err) res.send(err, 500);
-      else res.jsonp(body);
-  });
-});
+app.get('*', function (req, res, next) {
+  if (req.query.url == undefined) {
+    res.send("<html><body>Request Format: /?url=[URL]&format=[http(default)/json]</body></html>");
+  } else {
+    request(req.query.url, function (err, body) {
+        res.setHeader('Access-Control-Allow-Origin','*');
+        if (err) res.send(err, 500);
+        else if (req.query.format == "json") res.jsonp(body);
+        else res.send(body);
+    });
+  }
+})
 var port = process.env.PORT || 8000;
 app.listen(port, function() {
   console.log("Listening on " + port);
