@@ -1,3 +1,9 @@
+/*
+    nodeCSRproxy: A ready-to-deploy node.js proxy server app for making cross domain HTTP requests.
+    
+    Copyright (c) 2012 Glenn Rivkees
+*/
+
 var express = require('express');
 var http = require('http');
 var https = require('https');
